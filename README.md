@@ -19,15 +19,16 @@ XAMPP – Local server environment
 
 ▶️ How to Run the Project
 
-Install Node.js and XAMPP
+1.Install Node.js and XAMPP
 
-Start MySQL from XAMPP
+2.Start MySQL from XAMPP
 
-Import db.sql into MySQL
+3.Import db.sql into MySQL
 
-Open terminal in project folder and run:
+4.Open terminal in project folder and run:
 
 npm install
+
 node server.js
 
-Open index.html in a browser
+5.Open index.html in a browser
