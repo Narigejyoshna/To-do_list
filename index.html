@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: #cdeaf7;
+            padding: 10px;
+        }
+        .task {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .task-title {
+            font-weight: bold;
+        }
+        .form-section {
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <select id="categoryFilter" onchange="filterTasks()">
+        <option value="All">All</option>
+        <option value="Work">Work</option>
+        <option value="Personal">Personal</option>
+    </select>
+    <button onclick="showAddTask()">➕ Add Task</button>
+</div>
+
+<div id="taskList"></div>
+
+<div id="addTaskForm" style="display:none;" class="form-section">
+    <h3>Add a new Task</h3>
+    <label>Category:
+        <select id="newTaskCategory">
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+        </select>
+    </label>
+    <label>Title:
+        <input type="text" id="newTaskTitle">
+    </label>
+    <label>Description:
+        <textarea id="newTaskDescription" rows="4" cols="50"></textarea>
+    </label>
+    <br>
+    <button onclick="addTask()">Submit</button>
+    <button onclick="hideAddTask()">Cancel</button>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000';
+
+    async function fetchTasks(category = 'All') {
+        const res = await fetch(`${API_URL}/tasks?category=${category}`);
+        const tasks = await res.json();
+        renderTasks(tasks);
+    }
+
+    function renderTasks(tasks) {
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = '';
+        tasks.forEach(task => {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'task';
+            taskDiv.innerHTML = `<div class="task-title">${task.title}</div><div>${task.description}</div>`;
+            taskList.appendChild(taskDiv);
+        });
+    }
+
+    function filterTasks() {
+        const category = document.getElementById('categoryFilter').value;
+        fetchTasks(category);
+    }
+
+    function showAddTask() {
+        document.getElementById('addTaskForm').style.display = 'block';
+    }
+
+    function hideAddTask() {
+        document.getElementById('addTaskForm').style.display = 'none';
+        clearForm();
+    }
+
+    function clearForm() {
+        document.getElementById('newTaskTitle').value = '';
+        document.getElementById('newTaskDescription').value = '';
+        document.getElementById('newTaskCategory').value = 'Work';
+    }
+
+    async function addTask() {
+        const title = document.getElementById('newTaskTitle').value;
+        const description = document.getElementById('newTaskDescription').value;
+        const category = document.getElementById('newTaskCategory').value;
+
+        if (!title.trim() || !description.trim()) {
+            alert('Please fill in both title and description.');
+            return;
+        }
+
+        await fetch(`${API_URL}/tasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category, title, description })
+        });
+
+        filterTasks();
+        hideAddTask();
+    }
+
+    // Initial render
+    fetchTasks();
+</script>
+
+</body>
+</html>
